@@ -87,84 +87,101 @@ export default function addTaskScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 24,
-    paddingTop: 20,
+    backgroundColor: "#020617", // Deep obsidian theme
+    paddingHorizontal: 28,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1E293B",
-    marginBottom: 24,
-    letterSpacing: -0.5,
+    fontSize: 40,
+    fontWeight: "900",
+    color: "#F8FAFC",
+    letterSpacing: -2,
+    marginTop: 80, // Balanced top breathing room
+    marginBottom: 40,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 11,
+    fontWeight: "900",
     color: "#64748B",
     textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: 10,
+    letterSpacing: 2,
+    marginBottom: 12,
     marginLeft: 4,
   },
   input: {
-    backgroundColor: "#F1F5F9", // Light gray fill instead of just a border
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: "rgba(30, 41, 59, 0.4)", // Translucent glass effect
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     fontSize: 16,
-    color: "#1E293B",
+    color: "#F8FAFC",
+    fontWeight: "600",
+    marginBottom: 24,
     borderWidth: 1,
-    borderColor: "transparent", // Clean look, can change to color on focus
-    marginBottom: 20,
+    borderColor: "rgba(255, 255, 255, 0.08)",
   },
   textArea: {
     minHeight: 120,
     textAlignVertical: "top",
-    paddingTop: 16,
+    lineHeight: 24,
+    paddingTop: 18,
   },
+  // Status Selector Balance
   statusContainer: {
     flexDirection: "row",
-    gap: 12, // Tighter gap for a more cohesive chip look
-    marginBottom: 32,
-    flexWrap: "wrap",
+    justifyContent: "space-between", // Ensures items are spread evenly
+    gap: 8,
+    marginBottom: 40,
   },
   statusButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 100, // Pill shape for modern toggle buttons
-    backgroundColor: "#F1F5F9",
+    flex: 1, // Forces all buttons to be the exact same width
+    height: 48, // Fixed height for vertical symmetry
+    borderRadius: 14,
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-  },
-  statusButtonActive: {
-    backgroundColor: "#6366F1", // Indigo primary accent
-    borderColor: "#6366F1",
-    // Gentle glow for the active state
-    shadowColor: "#6366F1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  statusButtonText: {
-    color: "#64748B",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  statusButtonTextActive: {
-    color: "#FFFFFF",
-  },
-  button: {
-    backgroundColor: "#0F172A", // Dark Slate
-    paddingVertical: 18,
-    borderRadius: 16,
-    marginTop: 10,
+    borderColor: "rgba(255, 255, 255, 0.08)",
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
+  statusButtonActive: {
+    backgroundColor: "#8B5CF6", // Electric Violet accent
+    borderColor: "#A78BFA",
+    shadowColor: "#8B5CF6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  statusButtonText: {
+    color: "#64748B",
     fontWeight: "700",
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  statusButtonTextActive: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+  },
+  // Main Action Button
+  button: {
+    backgroundColor: "#FFFFFF", // High-contrast white for primary action
+    height: 64, // Larger touch target for the "Save" action
+    borderRadius: 22,
+    marginTop: "auto", // Pushes the button to the bottom of the container
+    marginBottom: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#FFFFFF",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  buttonText: {
+    color: "#020617",
+    fontSize: 16,
+    fontWeight: "900",
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
   },
 });

@@ -18,6 +18,7 @@ export default function TaskScreen() {
       const data = getTasks();
       setTasks(data);
     } catch (error) {
+      console.error(error);
       Alert.alert("Load Error", "Failed to Load the Tasks");
     }
   };
@@ -33,6 +34,7 @@ export default function TaskScreen() {
       deleteTask(id);
       loadTasks();
     } catch (error) {
+      console.error(error);
       Alert.alert("Delete Error", "Failed to Delete the Task");
     }
   };
@@ -61,6 +63,24 @@ export default function TaskScreen() {
               <Text style={styles.taskStatus}>{item.status}</Text>
 
               <View style={styles.actions}>
+                <Pressable
+                  style={styles.editButton}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/task-details",
+                      params: {
+                        id: item.id,
+                        title: item.title,
+                        description: item.description,
+                        status: item.status,
+                        edit: "true",
+                      },
+                    })
+                  }
+                >
+                  <Text style={styles.editButtonText}>Edit</Text>
+                </Pressable>
+
                 <Pressable
                   style={styles.detailButton}
                   onPress={() =>
@@ -96,103 +116,132 @@ export default function TaskScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFC", // Soft off-white background
+    backgroundColor: "#020617", // Deep Obsidian Navy
     paddingHorizontal: 24,
     paddingTop: 60,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: "#1E293B",
-    letterSpacing: -0.5,
+    fontSize: 40,
+    fontWeight: "900",
+    color: "#F8FAFC",
+    letterSpacing: -2,
     marginBottom: 24,
+    textShadowColor: "rgba(139, 92, 246, 0.4)",
+    textShadowRadius: 10,
   },
   addButton: {
-    backgroundColor: "#6366F1", // Modern Indigo
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 14,
-    marginBottom: 30,
-    alignSelf: "flex-start",
-    // Shadow/Elevation
-    shadowColor: "#6366F1",
-    shadowOffset: { width: 0, height: 4 },
+    backgroundColor: "#8B5CF6", // Electric Violet
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 18,
+    marginBottom: 32,
+    alignSelf: "stretch", // Full width for a more modern, bold look
+    alignItems: "center",
+    shadowColor: "#8B5CF6",
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 15,
+    elevation: 8,
   },
   addButtonText: {
     color: "#FFFFFF",
-    fontWeight: "700",
+    fontWeight: "900",
     fontSize: 16,
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
   },
   card: {
-    backgroundColor: "#FFFFFF",
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 16,
-    // Subtle card shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    backgroundColor: "rgba(30, 41, 59, 0.5)", // Semi-transparent glass
+    padding: 24,
+    borderRadius: 28,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
   taskTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1E293B",
-    marginBottom: 6,
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#F8FAFC",
+    marginBottom: 8,
   },
   taskDescription: {
     fontSize: 15,
-    color: "#64748B",
+    color: "#94A3B8",
     lineHeight: 22,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   taskStatus: {
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 11,
+    fontWeight: "900",
     textTransform: "uppercase",
-    letterSpacing: 1,
-    color: "#6366F1",
-    marginBottom: 12,
+    letterSpacing: 1.5,
+    color: "#06B6D4", // Cyan highlight
+    marginBottom: 16,
+    backgroundColor: "rgba(6, 182, 212, 0.1)",
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   actions: {
     flexDirection: "row",
     gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255, 255, 255, 0.05)",
+    paddingTop: 18,
   },
   detailButton: {
-    flex: 1,
-    backgroundColor: "#F1F5F9",
-    paddingVertical: 12,
-    borderRadius: 10,
+    flex: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   detailButtonText: {
-    color: "#475569",
-    fontWeight: "600",
+    color: "#F8FAFC",
+    fontWeight: "700",
     fontSize: 14,
   },
   deleteButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    backgroundColor: "#FFF1F2", // Soft red tint
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "rgba(225, 29, 72, 0.1)", // Translucent Rose
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(225, 29, 72, 0.2)",
   },
   deleteButtonText: {
-    color: "#E11D48", // Modern Rose/Red
-    fontWeight: "600",
+    color: "#FB7185",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  editButton: {
+    flex: 1,
+    backgroundColor: "rgba(34, 197, 94, 0.1)", // Translucent Green
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(34, 197, 94, 0.2)",
+  },
+  editButtonText: {
+    color: "#22C55E",
+    fontWeight: "700",
     fontSize: 14,
   },
   emptyText: {
     fontSize: 16,
-    color: "#94A3B8",
+    color: "#475569",
     textAlign: "center",
-    marginTop: 40,
-    fontStyle: "italic",
+    marginTop: 60,
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
 });

@@ -1,33 +1,65 @@
-import { useLocalSearchParams } from "expo-router";
+import { updateTask } from "@/lib/database";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    InteractionManager,
+    Alert,
+    Pressable,
     ScrollView,
     StyleSheet,
     Text,
+    TextInput,
     View,
 } from "react-native";
 
 export default function TaskDetail() {
-  const { id, title, description, status } = useLocalSearchParams<{
+  const { id, title, description, status, edit } = useLocalSearchParams<{
     id: string;
     title: string;
     description: string;
     status: string;
+    edit?: string;
   }>();
+
+  const isEditing = edit === "true";
+
+  const [editedTitle, setEditedTitle] = useState(title || "");
+  const [editedDescription, setEditedDescription] = useState(description || "");
+  const [editedStatus, setEditedStatus] = useState(status || "");
+  const [showStatusOptions, setShowStatusOptions] = useState(false);
+
+  const statusOptions = ["pending", "Ongoing", "Finished"];
 
   // 1. Add a ready state
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // 2. Wait for the navigation animation to finish
-    const task = InteractionManager.runAfterInteractions(() => {
-      setIsReady(true);
-    });
-
-    return () => task.cancel();
+    setIsReady(true);
   }, []);
+
+  const handleSave = () => {
+    if (!editedTitle.trim()) {
+      Alert.alert("Error", "Title is required");
+      return;
+    }
+    try {
+      updateTask(
+        Number.parseInt(id),
+        editedTitle,
+        editedDescription,
+        editedStatus,
+      );
+      Alert.alert("Success", "Task updated successfully");
+      router.back();
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to update task");
+    }
+  };
+
+  const handleCancel = () => {
+    router.back();
+  };
 
   // 3. Show a lightweight loader while transitioning
   if (!isReady) {
@@ -43,7 +75,9 @@ export default function TaskDetail() {
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
     >
-      <Text style={styles.headerTitle}>Task Detail</Text>
+      <Text style={styles.headerTitle}>
+        {isEditing ? "Edit Task" : "Task Detail"}
+      </Text>
 
       <View style={styles.card}>
         <View style={styles.detailGroup}>
@@ -53,60 +87,129 @@ export default function TaskDetail() {
 
         <View style={styles.detailGroup}>
           <Text style={styles.label}>Task Name</Text>
-          <Text style={styles.value}>{title}</Text>
+          {isEditing ? (
+            <TextInput
+              style={styles.input}
+              value={editedTitle}
+              onChangeText={setEditedTitle}
+              placeholder="Enter task title"
+              placeholderTextColor="#666"
+            />
+          ) : (
+            <Text style={styles.value}>{title}</Text>
+          )}
         </View>
 
         <View style={styles.detailGroup}>
           <Text style={styles.label}>Description</Text>
-          <Text style={styles.descriptionValue}>
-            {description || "No additional details provided."}
-          </Text>
+          {isEditing ? (
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={editedDescription}
+              onChangeText={setEditedDescription}
+              placeholder="Enter description"
+              placeholderTextColor="#666"
+              multiline
+            />
+          ) : (
+            <Text style={styles.descriptionValue}>
+              {description || "No additional details provided."}
+            </Text>
+          )}
         </View>
 
         <View style={[styles.detailGroup, styles.lastDetailGroup]}>
           <Text style={styles.label}>Status</Text>
-          <View style={styles.statusBadge}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>{status}</Text>
-          </View>
+          {isEditing ? (
+            <View>
+              <Pressable
+                style={styles.dropdownButton}
+                onPress={() => setShowStatusOptions(!showStatusOptions)}
+              >
+                <Text style={styles.dropdownText}>
+                  {editedStatus || "Select status"}
+                </Text>
+                <Text style={styles.dropdownArrow}>
+                  {showStatusOptions ? "▲" : "▼"}
+                </Text>
+              </Pressable>
+              {showStatusOptions && (
+                <View style={styles.optionsContainer}>
+                  {statusOptions.map((option, index) => (
+                    <Pressable
+                      key={option}
+                      style={[
+                        styles.option,
+                        index === statusOptions.length - 1 && styles.lastOption,
+                      ]}
+                      onPress={() => {
+                        setEditedStatus(option);
+                        setShowStatusOptions(false);
+                      }}
+                    >
+                      <Text style={styles.optionText}>{option}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+            </View>
+          ) : (
+            <View style={styles.statusBadge}>
+              <View style={styles.statusDot} />
+              <Text style={styles.statusText}>{status}</Text>
+            </View>
+          )}
         </View>
       </View>
+
+      {isEditing && (
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Save Changes</Text>
+          </Pressable>
+          <Pressable style={styles.cancelButton} onPress={handleCancel}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </Pressable>
+        </View>
+      )}
     </ScrollView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFC", // Ultra-light slate background
+    backgroundColor: "#020617", // Matches Index and Task list
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingHorizontal: 28,
+    paddingTop: 80, // Extra breathing room for the header
     paddingBottom: 40,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: "900",
-    color: "#0F172A",
-    letterSpacing: -1,
-    marginBottom: 28,
+    color: "#F8FAFC",
+    letterSpacing: -2,
+    marginBottom: 32,
+    textShadowColor: "rgba(139, 92, 246, 0.3)",
+    textShadowRadius: 15,
   },
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 24,
-    // Premium soft shadow
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.06,
-    shadowRadius: 20,
-    elevation: 3,
+    backgroundColor: "rgba(30, 41, 59, 0.4)", // Glassmorphism
+    borderRadius: 32,
+    padding: 28,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.3,
+    shadowRadius: 30,
   },
   detailGroup: {
-    marginBottom: 20,
-    paddingBottom: 20,
+    marginBottom: 24,
+    paddingBottom: 24,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: "rgba(255, 255, 255, 0.05)",
   },
   lastDetailGroup: {
     marginBottom: 0,
@@ -114,50 +217,145 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   label: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#94A3B8",
+    fontSize: 11,
+    fontWeight: "900",
+    color: "#64748B", // Dimmed slate
     textTransform: "uppercase",
-    letterSpacing: 1.5,
-    marginBottom: 8,
+    letterSpacing: 2,
+    marginBottom: 10,
   },
   value: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1E293B",
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#F8FAFC",
+    letterSpacing: -0.5,
   },
   idValue: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#6366F1", // Indigo accent for the ID
-    fontFamily: "System",
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#8B5CF6", // Violet
+    backgroundColor: "rgba(139, 92, 246, 0.1)",
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    overflow: "hidden",
   },
   descriptionValue: {
-    fontSize: 16,
-    color: "#475569",
-    lineHeight: 24,
+    fontSize: 17,
+    color: "#94A3B8",
+    lineHeight: 26,
+    fontWeight: "500",
   },
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: "#F1F5F9",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
+    backgroundColor: "rgba(6, 182, 212, 0.1)", // Translucent Cyan
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(6, 182, 212, 0.2)",
     marginTop: 4,
   },
   statusDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#6366F1",
-    marginRight: 8,
+    backgroundColor: "#06B6D4", // Cyan
+    marginRight: 10,
+    // Add a glow to the dot
+    shadowColor: "#06B6D4",
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
   },
   statusText: {
-    color: "#1E293B",
+    color: "#06B6D4",
     fontSize: 14,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  input: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 8,
+    padding: 12,
+    color: "#F8FAFC",
+    fontSize: 16,
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: "top",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    gap: 16,
+    marginTop: 32,
+  },
+  saveButton: {
+    flex: 1,
+    backgroundColor: "#22C55E",
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  saveButtonText: {
+    color: "#FFFFFF",
     fontWeight: "700",
-    textTransform: "capitalize",
+    fontSize: 16,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  cancelButtonText: {
+    color: "#F8FAFC",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  dropdownButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 8,
+    padding: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  dropdownText: {
+    color: "#F8FAFC",
+    fontSize: 16,
+  },
+  dropdownArrow: {
+    color: "#F8FAFC",
+    fontSize: 14,
+  },
+  optionsContainer: {
+    backgroundColor: "rgba(30, 41, 59, 0.8)",
+    borderRadius: 8,
+    marginTop: 4,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  option: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.05)",
+  },
+  lastOption: {
+    borderBottomWidth: 0,
+  },
+  optionText: {
+    color: "#F8FAFC",
+    fontSize: 16,
   },
 });

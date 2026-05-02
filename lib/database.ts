@@ -65,3 +65,23 @@ export function getTasks(): Task[] {
     throw error;
   }
 }
+
+//Function for the updateTask
+export function updateTask(
+  id: number,
+  title: string,
+  description: string,
+  status: string,
+) {
+  try {
+    db.runSync(
+      `
+            UPDATE tasks SET title = ?, description = ?, status = ? WHERE id = ?;
+        `,
+      [title, description, status, id],
+    );
+  } catch (error) {
+    console.error("Error Updating Task:", error);
+    throw error;
+  }
+}

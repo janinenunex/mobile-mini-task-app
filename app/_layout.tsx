@@ -7,8 +7,8 @@ export default function RootLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#2563EB",
-        tabBarInactiveTintColor: "#687280",
+        tabBarActiveTintColor: "#A78BFA",
+        tabBarInactiveTintColor: "#475569",
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
       }}
@@ -55,26 +55,26 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 70,
-    paddingBottom: 10,
-    paddingTop: 8,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
-
-    // Added the missing closing braces below
-    shadowColor: "#000",
+    height: 85, // Taller, more premium feel
+    backgroundColor: "#020617", // Matches the deep obsidian theme
+    borderTopWidth: 0, // Removes the dated top line
+    paddingTop: 12,
+    paddingBottom: 25,
+    // Floating effect (optional: add marginHorizontal and borderRadius for a true floating bar)
+    shadowColor: "#8B5CF6", // Violet glow
     shadowOffset: {
       width: 0,
-      height: -2,
+      height: -10,
     },
-    shadowOpacity: 0.1, // Added opacity to make shadow visible on iOS
-    shadowRadius: 4, // Added radius for a softer look
-    elevation: 5, // Added elevation for Android shadow support
-  }, // Fixed: Closing brace for tabBar was missing
-
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 20,
+  },
   tabBarLabel: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginTop: 4,
   },
 });
